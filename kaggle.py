@@ -181,7 +181,7 @@ numeric_features = ['Year_of_Release', 'NA_Sales', 'EU_Sales',
 
 categorical_features = ['Platform', 'Genre', 'Publisher', 'Developer', 'Rating']
 
-print(f"\n📋 Variables identificadas:")
+print(f"\nVariables identificadas:")
 print(f"   • Numéricas: {len(numeric_features)}")
 print(f"   • Categóricas: {len(categorical_features)}")
 
@@ -252,7 +252,7 @@ pipeline = Pipeline([
 ])
 
 
-print("\n🚀 Entrenando modelo 1")
+print("\nEntrenando modelo 1")
 pipeline.fit(X_train, y_train)
 y_pred = pipeline.predict(X_test)
 
@@ -264,6 +264,20 @@ rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 mae = mean_absolute_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
 mape = np.mean(np.abs((y_test - y_pred) / (y_test + 1e-10))) * 100
+
+print(f"\nVALIDACIÓN CRUZADA (5-fold):")
+cv = KFold(n_splits=5, shuffle=True, random_state=42)
+cv_scores = cross_val_score(pipeline, X_train, y_train, 
+                           cv=cv, scoring='r2', n_jobs=-1)
+
+print(f"   • R² por fold: {np.round(cv_scores, 4)}")
+print(f"   • R² promedio: {cv_scores.mean():.4f} ± {cv_scores.std()*2:.4f}")
+print(f"   • Rango: [{cv_scores.min():.4f}, {cv_scores.max():.4f}]")
+
+baseline_pred = np.full_like(y_test, y_train.median())
+baseline_rmse = np.sqrt(mean_squared_error(y_test, baseline_pred))
+baseline_r2 = r2_score(y_test, baseline_pred)
+
 
 print(f"\nMÉTRICAS DE REGRESIÓN:")
 print(f"   • R² Score: {r2:.4f} (Varianza explicada)")
@@ -343,19 +357,6 @@ print("="*70)
 print(f"Modelo 1 (con ventas regionales): R² = {r2:.4f}")
 print(f"Modelo 2 (sin ventas regionales): R² = {r2_2:.4f}")
 print(f"Diferencia: {r2 - r2_2:.4f} puntos de R²")
-
-print(f"\n🔄 VALIDACIÓN CRUZADA (5-fold):")
-cv = KFold(n_splits=5, shuffle=True, random_state=42)
-cv_scores = cross_val_score(pipeline, X_train, y_train, 
-                           cv=cv, scoring='r2', n_jobs=-1)
-
-print(f"   • R² por fold: {np.round(cv_scores, 4)}")
-print(f"   • R² promedio: {cv_scores.mean():.4f} ± {cv_scores.std()*2:.4f}")
-print(f"   • Rango: [{cv_scores.min():.4f}, {cv_scores.max():.4f}]")
-
-baseline_pred = np.full_like(y_test, y_train.median())
-baseline_rmse = np.sqrt(mean_squared_error(y_test, baseline_pred))
-baseline_r2 = r2_score(y_test, baseline_pred)
 
 print(f"\n COMPARACIÓN CON BASELINE (predecir mediana):")
 print(f"   • Baseline R²: {baseline_r2:.4f}")
