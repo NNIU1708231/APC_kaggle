@@ -383,13 +383,7 @@ feature_importance_df = pd.DataFrame({
     }).sort_values('Importance', ascending=False)
     
 print(feature_importance_df.head(10).to_string(index=False))
-    
-print(f" No se pudieron obtener nombres de características: {e}")
-importances = pipeline.named_steps['regressor'].feature_importances_
-top_indices = np.argsort(importances)[-10:][::-1]
-for idx in top_indices:
-    print(f"   Feature_{idx}: {importances[idx]:.4f}")
-
+  
 print(f"\nANÁLISIS DE ERRORES:")
 print(f"   • Error máximo: {np.max(np.abs(y_test - y_pred)):.4f}")
 print(f"   • Error mínimo: {np.min(np.abs(y_test - y_pred)):.4f}")
